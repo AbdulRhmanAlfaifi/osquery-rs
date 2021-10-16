@@ -1,0 +1,17 @@
+[package]
+name = "osquery-rs"
+version = "0.1.0"
+homepage = "https://github.com/AbdulRhmanAlfaifi/osquery-rs"
+repository = "https://github.com/AbdulRhmanAlfaifi/osquery-rs"
+authors = ["AbdulRhman Alfaifi <aalfaifi@u0041.co>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+thrift = "0.15.0"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+named_pipe = "0.4.1"
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+dirs = "4.0.0"
