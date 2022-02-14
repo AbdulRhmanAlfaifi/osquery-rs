@@ -1,6 +1,6 @@
 [package]
 name = "osquery-rs"
-version = "0.1.0"
+version = "0.1.1"
 homepage = "https://github.com/AbdulRhmanAlfaifi/osquery-rs"
 repository = "https://github.com/AbdulRhmanAlfaifi/osquery-rs"
 authors = ["AbdulRhman Alfaifi <aalfaifi@u0041.co>"]
