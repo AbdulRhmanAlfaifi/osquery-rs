@@ -2,7 +2,7 @@
 mod tests {
     use osquery_rs::OSQuery;
     #[test]
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn linux_time_test() {
         use dirs;
         let res = OSQuery::new()
@@ -17,7 +17,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     fn linux_time_test_span_instance() {
         let osquery_bin_path = &format!(
             "{}/{}/{}",
