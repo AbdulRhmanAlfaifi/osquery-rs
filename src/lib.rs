@@ -8,7 +8,7 @@ use thrift;
 
 #[cfg(target_os = "windows")]
 use named_pipe::PipeClient;
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
 use std::os::unix::net::UnixStream;
 use std::{
     io::Result,
@@ -43,7 +43,7 @@ impl OSQuery {
         Self {
             #[cfg(target_os = "windows")]
             _socket: String::from(r"\\.\pipe\osquery-rs"),
-            #[cfg(any(target_os = "linux", target_os = "macos"))]
+            #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
             _socket: String::from("/tmp/osquery-rs"),
             _socket_cleanup: false,
             osquery_instance: Option::None,
@@ -78,7 +78,7 @@ impl OSQuery {
     /// }
     /// ```
     pub fn spawn_instance(mut self, path: &str) -> Result<Self> {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
         {
             let osquery_instance = Command::new(path)
                 .args([
@@ -147,7 +147,7 @@ impl OSQuery {
             writer.set_write_timeout(Some(Duration::new(3, 0)));
             (reader, writer)
         };
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
         let (reader, writer) = {
             let reader = UnixStream::connect(&self._socket)?;
             reader.set_read_timeout(Some(Duration::new(3, 0)))?;
@@ -177,7 +177,7 @@ impl Drop for OSQuery {
             }
             None => {}
         }
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
         {
             if self._socket_cleanup {
                 std::fs::remove_file(&self._socket)
