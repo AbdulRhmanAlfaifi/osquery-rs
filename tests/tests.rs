@@ -34,6 +34,22 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
+    fn linux_long_timeout_test() {
+        use dirs;
+        let res = OSQuery::new()
+            .set_socket(&format!(
+                "{}/.osquery/shell.em",
+                dirs::home_dir().unwrap().to_string_lossy()
+            ))
+            .set_timeout(20)
+            .query(String::from("select sleep(20)"))
+            .unwrap();
+        println!("{:#?}", res);
+        assert_eq!(res.status.unwrap().code.unwrap(), 0);
+    }
+
+    #[test]
     #[cfg(target_os = "windows")]
     fn windows_time_test() {
         let res = OSQuery::new()

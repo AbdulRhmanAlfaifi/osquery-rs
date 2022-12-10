@@ -35,6 +35,7 @@ use thrift::protocol::{TBinaryInputProtocol, TBinaryOutputProtocol};
 pub struct OSQuery {
     _socket: String,
     _socket_cleanup: bool,
+    _timeout: u64,
     osquery_instance: Option<Child>,
 }
 
@@ -46,6 +47,7 @@ impl OSQuery {
             #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
             _socket: String::from("/tmp/osquery-rs"),
             _socket_cleanup: false,
+            _timeout: 10,
             osquery_instance: Option::None,
         }
     }
@@ -54,6 +56,17 @@ impl OSQuery {
     pub fn set_socket(mut self, path: &str) -> Self {
         self._socket = String::from(path);
         self
+    }
+
+    /// Set osquery queries timeout in seconds (default 10 seconds)
+    pub fn set_timeout(mut self, timeout: u64) -> Self {
+        self._timeout = timeout;
+        self
+    }
+
+    /// Get osquery queries timeout in seconds
+    pub fn get_timeout(&self) -> u64 {
+        self._timeout.clone()
     }
 
     /// A getter for socket used for comunication
@@ -140,18 +153,18 @@ impl OSQuery {
         #[cfg(target_os = "windows")]
         let (reader, writer) = {
             let mut reader = PipeClient::connect(&self._socket)?;
-            reader.set_read_timeout(Some(Duration::new(3, 0)));
-            reader.set_write_timeout(Some(Duration::new(3, 0)));
+            reader.set_read_timeout(Some(Duration::new(self._timeout, 0)));
+            reader.set_write_timeout(Some(Duration::new(self._timeout, 0)));
             let mut writer = PipeClient::connect(&self._socket)?;
-            writer.set_read_timeout(Some(Duration::new(3, 0)));
-            writer.set_write_timeout(Some(Duration::new(3, 0)));
+            writer.set_read_timeout(Some(Duration::new(self._timeout, 0)));
+            writer.set_write_timeout(Some(Duration::new(self._timeout, 0)));
             (reader, writer)
         };
         #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "macos"))]
         let (reader, writer) = {
             let reader = UnixStream::connect(&self._socket)?;
-            reader.set_read_timeout(Some(Duration::new(3, 0)))?;
-            reader.set_write_timeout(Some(Duration::new(3, 0)))?;
+            reader.set_read_timeout(Some(Duration::new(self._timeout, 0)))?;
+            reader.set_write_timeout(Some(Duration::new(self._timeout, 0)))?;
             let writer = reader.try_clone()?;
             (reader, writer)
         };
